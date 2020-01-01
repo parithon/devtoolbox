@@ -1,4 +1,29 @@
 function Invoke-Docker {
+  <#
+    .SYNOPSIS
+    Invoke docker commands using aliases
+
+    .PARAMETER Command
+    The docker command you want to invoke. You can use the default commands or the following alises:
+    - b   : docker build
+    - c   : docker container
+    - cs  : docker container start
+    - cx  : docker container stop
+    - i   : docker images
+    - t   : docker tag
+    - k   : docker kill
+    - l   : docker logs
+    - li  : docker login
+    - lo  : docker logout
+    - r   : docker run
+    - rmc : docker container rm
+    - p   : docker push
+    - v   : docker volume
+    - psa : docker ps -a
+
+    .PARAMETER Parameters
+    The docker command parameters.
+  #>
   [Alias("d")]
   Param
   (
@@ -8,8 +33,7 @@ function Invoke-Docker {
     [string[]]$Parameters
   )
 
-  $params = @()
-  $params += $Parameters
+  $params = @($Parameters)
 
   switch ($Command) {
     "b" { docker build @params }
@@ -26,6 +50,7 @@ function Invoke-Docker {
     "rmc" { docker container rm @params }
     "p" { docker push @params }
     "v" { docker volume @params }
+    "psa" { docker ps -a @params }
     default { docker $Command @params }
   }
 }
@@ -38,28 +63,12 @@ Register-ArgumentCompleter -CommandName Invoke-Docker -ParameterName Command -Sc
 
 Register-ArgumentCompleter -CommandName Invoke-Docker -ParameterName Parameters -ScriptBlock {
   param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-  $cmd = $fakeBoundParameters["Command"]
-  $ast = $commandAst.CommandElements | Where-Object Value -EQ $cmd
-  $subcmdidx = $commandAst.CommandElements.IndexOf($ast)
-  $subcmd = $commandAst.CommandElements[$subcmdidx + 1].Value
-
-  if ((-not $subcmd -or $subcmd -eq $wordToComplete) -and (Get-DockerCommand) -contains $cmd) {
+    $cmd = $fakeBoundParameters["Command"]
+    switch ($cmd) {
+      "rmi" {
+        $imgs = Get-DockerImage -All | Select-Object *,@{n="HasTag";e={$_.Tag -ne "<None>"}} | Sort-Object -Property HasTag, Created -Descending
+        return $(if ($wordToComplete) { $imgs.Name | Where-Object { $_ -like "$wordToComplete*" } } else { $imgs.Name } )
+      }
+    }
     $cmds = Get-DockerCommand $cmd
-    $results = $(if ($wordToComplete) { $cmds | Where-Object { $_ -like "$wordToComplete*" } } else { $cmds })
-    if ($results) { return $results }
-  }
-
-  if ($cmd -eq "container" -or $cmd -eq "rmc") {
-    $containers = Get-DockerContainer -a | Select-Object -ExpandProperty Names
-    return $containers
-  }
-
-  if ($subcmd -ne "ls" -or $subcmd -ne "build" -or $subcmd -ne "import") {
-    $images = Get-DockerImage -a | Select-Object ImageId, @{Name="RepoTag";Expression={$_.Repository+":"+$_.Tag}}
-    $options = @()
-    $options += $images | Where-Object {$_.RepoTag -ne "<none>:<none>"} | Select-Object -ExpandProperty RepoTag
-    $options += $images | Where-Object {$_.RepoTag -eq "<none>:<none>"} | Select-Object -ExpandProperty ImageId
-    $options = $options | Where-Object {-not ($commandAst.CommandElements | Select-Object -ExpandProperty Value).Contains($_)}
-    return $options
-  }
 }
