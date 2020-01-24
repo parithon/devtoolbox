@@ -14,9 +14,13 @@ jobs:
     - name: Bootstrap Powershell
       run: |
         & ./_build/bootstrap.ps1
-    - name: Invoke-Pester
-      run: |
-        Invoke-Pester -OutputFile Test.xml -OutputFormat NUnitXml
     - name: Test-ModuleManifest
       run: |
         Test-ModuleManifest ./src/devtoolbox.psd1
+    - name: Invoke-Pester
+      run: |
+        Invoke-Pester -OutputFile TestResults.xml -OutputFormat NUnitXml
+    - uses: actions/upload-artifact/@v1
+      with:
+        name: Upload Test Results
+        path: ./TestResults.Xml
