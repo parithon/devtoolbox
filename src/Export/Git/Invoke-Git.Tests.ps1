@@ -2,6 +2,8 @@ $Script:here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Script:sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace "\.Tests\.", "."
 . "$here\$sut"
 
+New-Item -Path function: -Name "git" -Value ""
+
 Describe "Testing aliases used by Invoke-Git" {
   $getParams = {
     param([Parameter(ValueFromRemainingArguments=$true)]$c)

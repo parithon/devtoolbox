@@ -2,6 +2,8 @@ $Script:here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Script:sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace "\.Tests\.", "."
 . "$here\$sut"
 
+New-Item -Path function: -Name "git" -Value ""
+
 Describe("Invoke-GitHubRepository") {
   $repoUrl = "https://github.com/MichaelJolley/devtoolbox"
   $repoSSH = "git@github.com:MichaelJolley/devtoolbox"

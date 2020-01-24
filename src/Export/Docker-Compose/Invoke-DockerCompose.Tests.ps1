@@ -7,6 +7,8 @@ foreach ($script in (Get-ChildItem -Filter *.ps1 -Exclude *.Tests.ps1 -Recurse (
   . $script
 }
 
+New-Item -Path function: -Name "docker-compose" -Value ""
+
 Describe "Testing aliases used by Invoke-DockerCompose" {
   $getParams = {
     param([Parameter(ValueFromRemainingArguments=$true)]$c)
