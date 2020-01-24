@@ -6,22 +6,17 @@ on:
     - actions-tests
 
 jobs:
-  Test-ModuleManifest:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-latest]
-        shell: [powershell,pwsh]
+  Test-ModuleManifest_PowerShell:
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v1
     - name: Test-ModuleManifest
-      shell: ${{ matrix.shell }}
+      shell: powershell
       run: |
         Test-ModuleManifest ./src/devtoolbox.psd1
 
-  Invoke-Pester:
+  Invoke-Pester_PowerShell:
     runs-on: windows-latest
 
     steps:
@@ -32,6 +27,28 @@ jobs:
         & ./_build/bootstrap.ps1
     - name: Invoke-Pester
       shell: powershell
+      run: |
+        Invoke-Pester -OutputFile TestResults.xml -OutputFormat NUnitXml
+    - uses: actions/upload-artifact/@v1
+      with:
+        name: Test Results
+        path: ./TestResults.Xml
+
+  Invoke-Pester_PowerShellCore:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Bootstrap Powershell
+      shell: pwsh
+      run: |
+        & ./_build/bootstrap.ps1
+    - name: Invoke-Pester
+      shell: pwsh
       run: |
         Invoke-Pester -OutputFile TestResults.xml -OutputFormat NUnitXml
     - uses: actions/upload-artifact/@v1
