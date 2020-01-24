@@ -9,9 +9,14 @@ jobs:
   Test-ModuleManifest:
     runs-on: windows-latest
 
+    strategy:
+      matrix:
+        shell: [powershell,pwsh]
+
     steps:
     - uses: actions/checkout@v1
     - name: Test-ModuleManifest
+      shell: ${{ matrix.shell }}
       run: |
         Test-ModuleManifest ./src/devtoolbox.psd1
 
@@ -21,9 +26,11 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Bootstrap Powershell
+      shell: powershell
       run: |
         & ./_build/bootstrap.ps1
     - name: Invoke-Pester
+      shell: powershell
       run: |
         Invoke-Pester -OutputFile TestResults.xml -OutputFormat NUnitXml
     - uses: actions/upload-artifact/@v1
