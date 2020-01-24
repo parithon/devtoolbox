@@ -1,0 +1,19 @@
+name: Tests
+
+on:
+  push:
+    branches:
+    - actions-tests
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Bootstrap Powershell
+      run: |
+        & ./_build/bootstrap.ps1
+    - name: Invoke-Pester
+      run: |
+        Invoke-Pester
