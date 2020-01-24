@@ -7,10 +7,11 @@ on:
 
 jobs:
   Test-ModuleManifest:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
+        os: [windows-latest]
         shell: [powershell,pwsh]
 
     steps:
