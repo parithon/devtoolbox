@@ -16,4 +16,7 @@ jobs:
         & ./_build/bootstrap.ps1
     - name: Invoke-Pester
       run: |
-        Invoke-Pester -OutFile Test.xml -OutputFormat NUnitXml
+        Invoke-Pester -OutputFile Test.xml -OutputFormat NUnitXml
+    - name: Test-ModuleManifest
+      run: |
+        Test-ModuleManifest ./src/devtoolbox.psd1
