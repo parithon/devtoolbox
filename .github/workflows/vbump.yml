@@ -1,0 +1,81 @@
+name: Versioning
+
+on:
+  pull_request:
+    branches:
+    - master
+  push: # also include this 'branch' for testing
+    branches:
+    - actions-versioning
+
+jobs:
+  Update-ManifestVersion:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: 'michaeljolley/devtoolbox'
+        ref: 'vNext'
+        path: '.master'
+
+    - uses: actions/checkout@v2
+      with:
+        path: '.current'
+
+    - name: 'Bootstraping PowerShell'
+      run: |
+        & .master/_build/bootstrap.ps1
+
+    - name: 'Gathering manifest and function metadata'
+      run: |
+        Import-Module Configuration
+        New-Object PSObject -Property @{
+          Functions = ((Get-ChildItem -Path '.master/src/Export' -Recurse -Filter *.ps1 -Exclude *Tests*).BaseName) -join ";"
+          ModuleVersion = (Test-ModuleManifest -Path .master/src/devtoolbox.psd1).Version
+        } | Export-Csv -NoTypeInformation Metadata.csv
+
+    - name: 'Update the current module manifest'
+      run: |
+        $metadata = Import-Csv Metadata.csv | Select-Object ModuleVersion, @{n="Functions";e={ $_.Functions -split ";" }}
+        $functionsToExport = (Get-ChildItem -Path '.current/src/Export' -Recurse -Filter *.ps1 -Exclude *Tests*).BaseName
+        $isMajor = $false
+        $isMinor = $false
+        
+        # Check whether new functions exist or if a function name has changed
+        & {
+          foreach ($func in $functionsToExport) {
+            if ($metadata.Functions -notcontains $func) {
+              # New or Changed function found
+              $isMinor = $true
+            }
+          }
+        }
+
+        # Update the manifest
+        & {
+          # Create the Get-FunctionAliases function
+          . '.current/src/Private/Get-FunctionAliases.ps1'
+
+          # Generate the version number
+          $version = ""
+          if ($isMajor) {
+            $version = "$($metadata.ModuleVersion.Major + 1).0.0"
+          }
+          elseif ($isMinor) {
+            $version = "$($metadata.ModuleVersion.Major).$($metadata.ModuleVersion.Minor + 1).0"
+          }
+          else {
+            $version = "$($metadata.ModuleVersion.Major).$($metadata.ModuleVersion.Minor).$($metdata.ModuleVersion.Build + 1)"
+          }
+
+          # Update the manifest
+          Update-ModuleManifest -Path '.current/src/devtoolbox.psd1' `
+            -RootModule devtoolbox.psm1 `
+            -FunctionsToExport $functionsToExport `
+            -AliasesToExport ($functionsToExport | Get-FunctionAliases) `
+            -ModuleVersion $version
+        }
+
+        # Test the manifest
+        Test-ModuleManifest -Path '.current/src/devtoolbox.psd1'

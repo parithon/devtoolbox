@@ -28,8 +28,6 @@ Get-ChildItem *.ps1 -Path Export,Private -Recurse | Foreach-Object {
   . $_.FullName
 }
 
-$currentMetadata = Test-ModuleManifest -Path "$ModulePath.psd1"
-
 $functionsToExport = Get-ChildItem *.ps1 -Path Export -Recurse | `
   # Get the name of the function  
   Select-Object -ExpandProperty BaseName | `
