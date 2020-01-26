@@ -28,17 +28,13 @@ jobs:
       run: |
         & .master/_build/bootstrap.ps1
 
-    - name: 'Gathering manifest and function metadata'
-      run: |
-        Import-Module Configuration
-        New-Object PSObject -Property @{
-          Functions = ((Get-ChildItem -Path '.master/src/Export' -Recurse -Filter *.ps1 -Exclude *Tests*).BaseName) -join ";"
-          ModuleVersion = (Test-ModuleManifest -Path '.master/src/devtoolbox.psd1').Version
-        } | Export-Csv -NoTypeInformation Metadata.csv
-
     - name: 'Update the current module manifest'
       run: |
-        $metadata = Import-Csv Metadata.csv | Select-Object ModuleVersion, @{n="Functions";e={ $_.Functions -split ";" }}
+        Import-Module Configuration
+        $metadata = New-Object PSObject -Property @{
+          Functions = (Get-ChildItem -Path '.master/src/Export' -Recurse -Filter *.ps1 -Exclude *Tests*).BaseName
+          ModuleVersion = (Test-ModuleManifest -Path '.master/src/devtoolbox.psd1').Version
+        }
         $functionsToExport = (Get-ChildItem -Path '.current/src/Export' -Recurse -Filter *.ps1 -Exclude *Tests*).BaseName
         $isMajor = $false
         $isMinor = $false
