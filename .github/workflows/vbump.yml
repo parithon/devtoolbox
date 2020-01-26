@@ -42,6 +42,8 @@ jobs:
         $functionsToExport = (Get-ChildItem -Path '.current/src/Export' -Recurse -Filter *.ps1 -Exclude *Tests*).BaseName
         $isMajor = $false
         $isMinor = $false
+
+        Write-Output $metadata
         
         # Check whether new functions exist or if a function name has changed
         & {
