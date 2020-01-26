@@ -2,11 +2,12 @@ name: Versioning
 
 on:
   pull_request:
-    branches:
+    types: [labeled] # Only run if we are a pull_request AND have been labeled
+    branches: # Only run if the pull_request is on the master branch
     - master
-  push: # also include this 'branch' for testing
+  push:
     branches:
-    - actions-versioning
+    - actions-versioning # Also include this branch for testing
 
 jobs:
   Update-ManifestVersion:
@@ -32,7 +33,7 @@ jobs:
         Import-Module Configuration
         New-Object PSObject -Property @{
           Functions = ((Get-ChildItem -Path '.master/src/Export' -Recurse -Filter *.ps1 -Exclude *Tests*).BaseName) -join ";"
-          ModuleVersion = (Test-ModuleManifest -Path .master/src/devtoolbox.psd1).Version
+          ModuleVersion = (Test-ModuleManifest -Path '.master/src/devtoolbox.psd1').Version
         } | Export-Csv -NoTypeInformation Metadata.csv
 
     - name: 'Update the current module manifest'
