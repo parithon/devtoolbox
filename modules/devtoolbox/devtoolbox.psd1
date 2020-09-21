@@ -9,10 +9,10 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    # RootModule = ''
+    RootModule = 'devtoolbox.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.6.2'
+    ModuleVersion     = '0.7.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -60,40 +60,16 @@
     # ScriptsToProcess = @('')
 
     # Type files (.ps1xml) to be loaded when importing this module
-    # TypesToProcess = @()
+    TypesToProcess = @('.\export\docker\Types.ps1xml')
 
     # Format files (.ps1xml) to be loaded when importing this module
-    # FormatsToProcess = @()
+    FormatsToProcess = @('.\export\docker\Formats.ps1xml')
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-    NestedModules     = @(
-        './functions/Docker.psm1',
-        './functions/DockerCompose.psm1',
-        './functions/Git.psm1',
-        './functions/GitHub.psm1',
-        './functions/HelperFunctions.psm1',
-        './functions/GotoDevProject.psm1',
-        './functions/ReloadEnv.psm1'
-    )
+    NestedModules     = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = @(
-        'Invoke-Docker',
-        'Invoke-DockerCompose',
-        'Invoke-Git'
-        'Invoke-GitHubRepository',
-        'Restore-WorkspacePackages',
-        'Get-Syntax',
-        'Invoke-ReverseSort',
-        'Edit-HostsFile',
-        'Invoke-PowerShell',
-        'Restart-PowerShell',
-        'Test-PSHostHasAdministrator',
-        'Restart-PSHost',
-        'Out-Menu',
-        'Invoke-GotoDevProject'
-        'Invoke-ReloadEnvironment'
-    )
+    FunctionsToExport = @('Get-DockerCommands','Get-DockerContainer','Get-DockerImage','Invoke-Docker')
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = @()
@@ -102,20 +78,7 @@
     VariablesToExport = '*'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport   = @(
-        'd',
-        'dc',
-        'g',
-        'gh',
-        'hosts',
-        'IsAdmin',
-        'reload',
-        'rwp',
-        'Sort-Reverse',
-        'Syntax',
-        'p',
-        'proj'
-    )
+    AliasesToExport   = @('gdc','gdi','d')
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -157,4 +120,54 @@
     # DefaultCommandPrefix = ''
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

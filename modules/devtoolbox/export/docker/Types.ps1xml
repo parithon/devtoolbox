@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+  <Type>
+    <Name>Docker.Image</Name>
+    <Members>
+      <AliasProperty>
+        <Name>ImageId</Name>
+        <ReferencedMemberName>Id</ReferencedMemberName>
+      </AliasProperty>
+      <MemberSet>
+        <Name>PsStandardMembers</Name>
+        <Members>
+          <NoteProperty>
+            <Name>DefaultDisplayProperty</Name>
+            <Value>Repository</Value>
+          </NoteProperty>
+          <PropertySet>
+            <Name>DefaultDisplayPropertySet</Name>
+            <ReferencedProperties>
+              <Name>Repository</Name>
+              <Name>Tag</Name>
+              <Name>ImageId</Name>
+              <Name>Created</Name>
+              <Name>Size</Name>
+            </ReferencedProperties>
+          </PropertySet>
+          <PropertySet>
+            <Name>DefaultKeyPropertySet</Name>
+            <ReferencedProperties>
+              <Name>Repository</Name>
+            </ReferencedProperties>
+          </PropertySet>
+        </Members>
+      </MemberSet>
+    </Members>
+  </Type>
+  <Type>
+    <Name>Docker.Container</Name>
+    <Members>
+      <ScriptProperty>
+        <Name>Image</Name>
+        <GetScriptBlock>
+          Get-DockerImage $this.ImageId
+        </GetScriptBlock>      
+      </ScriptProperty>
+      <ScriptProperty IsHidden="true">
+        <Name>ImageName</Name>
+        <GetScriptBlock>
+          $this.Config.Image
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty IsHidden="true">
+        <Name>Status</Name>
+        <GetScriptBlock>
+          ("{0} ({1}) {2}" -f $this.State.Status, $this.State.ExitCode, $this.State.FinishedAt)
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty IsHidden="true">
+        <Name>Ports</Name>
+        <GetScriptBlock>
+          $_.NetworkSettings.Ports
+        </GetScriptBlock>
+      </ScriptProperty>
+      <MemberSet>
+        <Name>PsStandardMembers</Name>
+        <Members>
+          <NoteProperty>
+            <Name>DefaultDisplayProperty</Name>
+            <Value>Id</Value>
+          </NoteProperty>
+          <PropertySet>
+            <Name>DefaultDisplayPropertySet</Name>
+            <ReferencedProperties>
+              <Name>Id</Name>
+              <Name>Image</Name>
+              <Name>Command</Name>
+              <Name>Created</Name>
+              <Name>Status</Name>
+              <Name>Ports</Name>
+              <Name>Name</Name>
+            </ReferencedProperties>
+          </PropertySet>
+          <PropertySet>
+            <Name>DefaultKeyPropertySet</Name>
+            <ReferencedProperties>
+              <Name>Id</Name>
+            </ReferencedProperties>
+          </PropertySet>
+        </Members>
+      </MemberSet>
+    </Members>
+  </Type>
+</Types>
